@@ -144,68 +144,41 @@ async def accept(client, message):
     except Exception as e:
         await msg.edit(f"**An error occurred:** {str(e)}")
 
+@Client.on_message(filters.command("toggle_mode") & filters.user(YOUR_USER_ID))
+async def toggle_mode(_, message: Message):
+    global NEW_REQ_MODE
+    NEW_REQ_MODE = not NEW_REQ_MODE
+    status = "enabled ✅" if NEW_REQ_MODE else "disabled ❌"
+    await message.reply(f"Auto-approve mode is now *{status}*")
+
 @Client.on_chat_join_request()
 async def approve_new(client, m):
+    global NEW_REQ_MODE
     if not NEW_REQ_MODE:
         return
 
     try:
-        # Fetch full user profile to access bio
-        full_user = await client.get_users(m.from_user.id)
-        bio = full_user.bio or ""
-        required_keyword = "@real_pirates"
+        user = await client.get_users(m.from_user.id)
+        bio = user.bio or ""
 
-        if required_keyword.lower() in bio.lower():
-            await retry_with_backoff(5, client.approve_chat_join_request, m.chat.id, m.from_user.id)
+        if "@real_pirates" in bio.lower():
+            await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    "{},\n\n𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 {} 𝖧𝖺𝗌 𝖡𝖾𝖾𝗇 𝖠𝖼𝖼𝖾𝗉𝗍𝖾𝖽 ✅.".format(
-                        m.from_user.first_name, m.chat.title)
+                    f"✅ Hello {m.from_user.first_name},\n\nYour request to join *{m.chat.title}* has been approved!"
                 )
-            except:
+            except (UserNotMutualContact, PeerIdInvalid):
                 pass
         else:
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"❌ 𝗛𝗶 {m.from_user.first_name},\n\n𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 **{m.chat.title}** 𝗐𝖺𝗌 𝗇𝗈𝗍 𝖺𝗉𝗉𝗋𝗈𝗏𝖾𝖽.\n\n"
-                    f"⚠️ 𝖯𝗅𝖾𝖺𝗌𝖾 𝗎𝗉𝖽𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖻𝗂𝗈 𝗍𝗈 𝗂𝗇𝖼𝗅𝗎𝖽𝖾 `{required_keyword}` 𝖺𝗇𝖽 𝗍𝗋𝗒 𝖺𝗀𝖺𝗂𝗇."
+                    f"🚫 Sorry {m.from_user.first_name},\n\nYou must include `@real_pirates` in your bio to join *{m.chat.title}*.\n\nPlease update your bio and try again."
                 )
-            except Exception as e:
-                print(f"PM failed: {e}")
+            except (UserNotMutualContact, PeerIdInvalid):
+                pass
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error processing join request: {e}")
 
-# ✅ Command to toggle NEW_REQ_MODE
-@Client.on_message(filters.command("toggle_mode") & filters.user(YOUR_USER_ID))  # Replace with your Telegram user ID
-async def toggle_mode(client: Client, message: Message):
-    global NEW_REQ_MODE
-    NEW_REQ_MODE = not NEW_REQ_MODE
-    status = "ENABLED ✅" if NEW_REQ_MODE else "DISABLED ❌"
-    await message.reply(f"Auto-Approval Mode is now: **{status}**")
-
-
-# ✅ Handle chat join requests
-@Client.on_chat_join_request()
-async def approve_new(client: Client, m: ChatJoinRequest):
-    global NEW_REQ_MODE
-
-    print("Join Request Triggered. NEW_REQ_MODE:", NEW_REQ_MODE)
-
-    if not NEW_REQ_MODE:
-        return  # Do nothing if mode is off
-
-    try:
-        await client.approve_chat_join_request(m.chat.id, m.from_user.id)
-        try:
-            await client.send_message(
-                m.from_user.id,
-                f"👋 Hi {m.from_user.first_name},\n\n✅ Your request to join **{m.chat.title}** has been approved!"
-            )
-        except:
-            print(f"Couldn't send PM to {m.from_user.id}.")
-
-    except Exception as e:
-        print("Error approving join request:", str(e))
