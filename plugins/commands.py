@@ -161,6 +161,7 @@ async def approve_new(client, m):
         user = await client.get_users(m.from_user.id)
         bio = user.bio or ""
 
+
         if "@real_pirates" in bio.lower():
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
