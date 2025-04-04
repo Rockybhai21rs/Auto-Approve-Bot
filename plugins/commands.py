@@ -143,32 +143,31 @@ async def accept(client, message):
 
 @Client.on_chat_join_request()
 async def approve_new(client, m):
-    if NEW_REQ_MODE == False:
+    if not NEW_REQ_MODE:
         return
-    try:
-        # Get full user info
-        user_info = await client.get_users(m.from_user.id)
-        bio = user_info.bio or ""
 
-        if "@real_pirates" in bio:
-            # Approve the request
+    try:
+        user = await client.get_users(m.from_user.id)
+        bio = (user.bio or "").lower()
+
+        if "real pirates" in bio:
             await retry_with_backoff(5, client.approve_chat_join_request, m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    "{},\n\n✅ 𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 {} 𝖧𝖺𝗌 𝖡𝖾𝖾𝗇 𝖠𝖼𝖼𝖾𝗉𝗍𝖾𝖽.".format(m.from_user.first_name, m.chat.title)
+                    f"✅ Your request to join '{m.chat.title}' has been approved! 🏴‍☠️"
                 )
             except:
                 pass
         else:
-            # Do not approve — just send a message
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"❌ 𝗛𝗲𝘆 {m.from_user.first_name},\n\nYou need to have `@real_pirates` in your bio to join **{m.chat.title}**.\n\nPlease update your bio and try again."
+                    f"❌ To join '{m.chat.title}', your bio must contain 'real pirates'. Please update it and try again."
                 )
             except:
                 pass
-            print(f"Join request from {m.from_user.id} left pending (bio missing @real_pirates)")
+
     except Exception as e:
-        print(f"[ERROR] while handling join request: {str(e)}")
+        print(str(e))
+        pass
