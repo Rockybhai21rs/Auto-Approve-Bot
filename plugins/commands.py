@@ -146,11 +146,13 @@ async def approve_new(client, m):
     if not NEW_REQ_MODE:
         return
 
-    bio = m.from_user.bio or ""
-    required_keyword = "@real_pirates"
+    try:
+        # Fetch full user profile to access bio
+        full_user = await client.get_users(m.from_user.id)
+        bio = full_user.bio or ""
+        required_keyword = "@real_pirates"
 
-    if required_keyword.lower() in bio.lower():
-        try:
+        if required_keyword.lower() in bio.lower():
             await retry_with_backoff(5, client.approve_chat_join_request, m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
@@ -160,14 +162,15 @@ async def approve_new(client, m):
                 )
             except:
                 pass
-        except Exception as e:
-            print(str(e))
-    else:
-        try:
-            await client.send_message(
-                m.from_user.id,
-                f"❌ 𝗛𝗶 {m.from_user.first_name},\n\n𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 **{m.chat.title}** 𝗐𝖺𝗌 𝗇𝗈𝗍 𝖺𝗉𝗉𝗋𝗈𝗏𝖾𝖽.\n\n"
-                f"⚠️ 𝖯𝗅𝖾𝖺𝗌𝖾 𝗎𝗉𝖽𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖻𝗂𝗈 𝗍𝗈 𝗂𝗇𝖼𝗅𝗎𝖽𝖾 `{required_keyword}` 𝖺𝗇𝖽 𝗍𝗋𝗒 𝖺𝗀𝖺𝗂𝗇."
-            )
-        except Exception as e:
-            print(f"PM failed: {e}")
+        else:
+            try:
+                await client.send_message(
+                    m.from_user.id,
+                    f"❌ 𝗛𝗶 {m.from_user.first_name},\n\n𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 **{m.chat.title}** 𝗐𝖺𝗌 𝗇𝗈𝗍 𝖺𝗉𝗉𝗋𝗈𝗏𝖾𝖽.\n\n"
+                    f"⚠️ 𝖯𝗅𝖾𝖺𝗌𝖾 𝗎𝗉𝖽𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖻𝗂𝗈 𝗍𝗈 𝗂𝗇𝖼𝗅𝗎𝖽𝖾 `{required_keyword}` 𝖺𝗇𝖽 𝗍𝗋𝗒 𝖺𝗀𝖺𝗂𝗇."
+                )
+            except Exception as e:
+                print(f"PM failed: {e}")
+
+    except Exception as e:
+        print(f"Error: {e}")
