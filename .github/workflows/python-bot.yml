@@ -1,8 +1,9 @@
-name: Run Auto Approve Bot
+name: Auto Approve Bot
 
 on:
-  workflow_dispatch:  # Run manually from GitHub Actions
-  push:               # Or automatically on push to any branch
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour
+  workflow_dispatch:       # Also allows manual run
 
 jobs:
   run-bot:
@@ -22,11 +23,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run bot
+    - name: Run bot (will auto-restart every hour)
       env:
         API_ID: ${{ secrets.API_ID }}
         API_HASH: ${{ secrets.API_HASH }}
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        FORCE_SUB_CHANNEL: ${{ secrets.FORCE_SUB_CHANNEL }}  # Optional
+        FORCE_SUB_CHANNEL: ${{ secrets.FORCE_SUB_CHANNEL }}
       run: |
-        python bot.py
+        echo "Bot is running for 55 minutes..."
+        timeout 55m python bot.py
