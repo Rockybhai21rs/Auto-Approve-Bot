@@ -9,5 +9,5 @@ DB_URI = environ.get("DB_URI", "")
 DB_NAME = environ.get("DB_NAME", "autoacceptbot")
 NEW_REQ_MODE = bool(environ.get('NEW_REQ_MODE', True))
 IS_FSUB = bool(environ.get("FSUB", True))
-AUTH_CHANNELS = environ.get("AUTH_CHANNEL", "-1002358303823")
+AUTH_CHANNELS = environ.get("AUTH_CHANNEL", "-1002367158951")
 AUTH_CHANNELS = [int(channel_id) for channel_id in AUTH_CHANNELS.split(",")]
