@@ -1,9 +1,9 @@
 from os import environ
 
-API_ID = int(environ.get("API_ID", ""))
-API_HASH = environ.get("API_HASH", "")
-BOT_TOKEN = environ.get("BOT_TOKEN", "")
-LOG_CHANNEL = int(environ.get("LOG_CHANNEL", ""))
+API_ID = int(environ.get("API_ID", "6681cd17e17fb536d00bfad2bd9f0cd6"))
+API_HASH = environ.get("API_HASH", "22193332")
+BOT_TOKEN = environ.get("BOT_TOKEN", "7509459901:AAHLb7yGn0YhHasiOVM8UdFioeZX0v9gnFY")
+LOG_CHANNEL = int(environ.get("LOG_CHANNEL", "-1002206934353"))
 ADMINS = int(environ.get("ADMINS", ""))
 DB_URI = environ.get("DB_URI", "")
 DB_NAME = environ.get("DB_NAME", "autoacceptbot")
