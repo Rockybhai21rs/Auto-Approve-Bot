@@ -130,46 +130,45 @@ async def accept(client, message):
         return await message.reply("**Message Not Forwarded From Channel Or Group.**")
     await vj.delete()
     msg = await show.edit("**Accepting all join requests... Please wait until it's completed.**")
-        try:
-            while True:
-                join_requests = [req async for req in acc.get_chat_join_requests(chat_id)]
-                if not join_requests:
-                    break
+    try:
+        while True:
+            await retry_with_backoff(5, acc.approve_all_chat_join_requests, chat_id)
+            await asyncio.sleep(1)
+            join_requests = [request async for request in acc.get_chat_join_requests(chat_id)]
+            if not join_requests:
+                break
+        await msg.edit("**Successfully accepted all join requests.**")
+    except Exception as e:
+        await msg.edit(f"**An error occurred:** {str(e)}")
 
-                for req in join_requests:
-                    try:
-                        full_user = await acc.get_users(req.from_user.id)
-                        user_bio = full_user.bio or ""
-                        if "@Real_pirates" in user_bio:
-                            await retry_with_backoff(5, acc.approve_chat_join_request, chat_id, req.from_user.id)
-                            await asyncio.sleep(1)
-                        else:
-                            print(f"[PENDING-REJECT] {req.from_user.id} skipped: bio doesn't contain @Real_pirates")
-                    except Exception as e:
-                        print(f"[ERROR user {req.from_user.id}]: {e}")
-
-            await msg.edit("✅ Done! Approved only users with `@Real_pirates` in their bio.")
 @Client.on_chat_join_request()
 async def approve_new(client, m):
-    if not NEW_REQ_MODE:
+    if NEW_REQ_MODE == False:
         return
-
     try:
-        user = await client.get_chat_member(m.chat.id, m.from_user.id)
-        full_user = await client.get_users(m.from_user.id)
+        # Get full user info
+        user_info = await client.get_users(m.from_user.id)
+        bio = user_info.bio or ""
 
-        user_bio = full_user.bio or ""
-        if "@Real_pirates" in user_bio:
+        if "@real_pirates" in bio:
+            # Approve the request
             await retry_with_backoff(5, client.approve_chat_join_request, m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"{m.from_user.first_name},\n\nYour request to join {m.chat.title} has been approved."
+                    "{},\n\n✅ 𝖸𝗈𝗎𝗋 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖳𝗈 𝖩𝗈𝗂𝗇 {} 𝖧𝖺𝗌 𝖡𝖾𝖾𝗇 𝖠𝖼𝖼𝖾𝗉𝗍𝖾𝖽.".format(m.from_user.first_name, m.chat.title)
                 )
             except:
                 pass
         else:
-            print(f"[AUTO-REJECT] {m.from_user.id} skipped: bio doesn't contain @Real_pirates")
-
+            # Do not approve — just send a message
+            try:
+                await client.send_message(
+                    m.from_user.id,
+                    f"❌ 𝗛𝗲𝘆 {m.from_user.first_name},\n\nYou need to have `@real_pirates` in your bio to join **{m.chat.title}**.\n\nPlease update your bio and try again."
+                )
+            except:
+                pass
+            print(f"Join request from {m.from_user.id} left pending (bio missing @real_pirates)")
     except Exception as e:
-        print(f"[ERROR auto-approve]: {e}")
+        print(f"[ERROR] while handling join request: {str(e)}")
