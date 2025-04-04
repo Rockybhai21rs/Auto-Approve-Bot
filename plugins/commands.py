@@ -151,16 +151,16 @@ async def toggle_mode(_, message: Message):
     status = "enabled ✅" if NEW_REQ_MODE else "disabled ❌"
     await message.reply(f"Auto-approve mode is now *{status}*")
 
+
 @Client.on_chat_join_request()
-async def approve_new(client, m):
+async def approve_new(client, m: ChatJoinRequest):
     global NEW_REQ_MODE
     if not NEW_REQ_MODE:
         return
 
     try:
-        user = await client.get_users(m.from_user.id)
+        user = await client.get_chat(m.from_user.id)  # FIXED: get_chat includes bio
         bio = user.bio or ""
-
 
         if "@real_pirates" in bio.lower():
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
@@ -172,6 +172,7 @@ async def approve_new(client, m):
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
         else:
+            await client.decline_chat_join_request(m.chat.id, m.from_user.id)  # Reject the request
             try:
                 await client.send_message(
                     m.from_user.id,
