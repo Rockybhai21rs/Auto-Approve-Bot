@@ -245,7 +245,7 @@ We’re happy to have you with us. Let the fun begin! 😉
 <b><i>||If you remove that id from your bio, you will be removed from the channel. 💀  
 This tag is required to remain a verified member of *{m.chat.title}*.  
 Make sure to keep it in your bio at all time to avoid removal. 😘||</i></b>""",
-                    parse_mode="html"
+                  
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
