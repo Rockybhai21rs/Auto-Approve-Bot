@@ -29,12 +29,36 @@ async def retry_with_backoff(retries, coroutine, *args, **kwargs):
             delay *= 2
 
 
-# Connect to SQLite DB (or create it)
-conn = sqlite3.connect("channels.db")
+# Connect to DB (make sure to name your DB file correctly)
+conn = sqlite3.connect("bot_data.db", check_same_thread=False)
 cur = conn.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS channels (chat_id INTEGER PRIMARY KEY, title TEXT)")
+
+# ✅ Create table if not exists
+cur.execute("""
+CREATE TABLE IF NOT EXISTS channels (
+    chat_id INTEGER PRIMARY KEY,
+    title TEXT
+)
+""")
 conn.commit()
 
+
+@Client.on_chat_member_updated()
+async def track_admin_channels(client, update: ChatMemberUpdated):
+    chat = update.chat
+    new_status = update.new_chat_member.status
+    old_status = update.old_chat_member.status
+
+    # Check if bot was promoted to ADMIN in a CHANNEL
+    if chat.type == "channel" and old_status != ChatMemberStatus.ADMINISTRATOR and new_status == ChatMemberStatus.ADMINISTRATOR:
+        chat_id = chat.id
+        title = chat.title
+
+        # Save to DB
+        cur.execute("INSERT OR IGNORE INTO channels (chat_id, title) VALUES (?, ?)", (chat_id, title))
+        conn.commit()
+        print(f"✅ Bot is now admin in: {title} ({chat_id})")
+        
 @Client.on_chat_member_updated()
 async def track_channels(client: Client, update: ChatMemberUpdated):
     if update.new_chat_member.user.id != client.me.id:
@@ -79,27 +103,30 @@ async def start_message(c, m):
 
     await m.reply_text(text, reply_markup=buttons)
 
-@Client.on_callback_query(filters.regex("open_settings"))
+@Client.on_callback_query(filters.regex("^settings$"))
 async def open_settings_cb(client, callback_query):
-    cur.execute("SELECT chat_id, title FROM channels")
-    rows = cur.fetchall()
+    user_id = callback_query.from_user.id
 
-    if not rows:
-        await callback_query.message.edit("🤖 I'm not an admin in any channels/groups yet.")
+    # Fetch all channels from DB
+    cur.execute("SELECT chat_id, title FROM channels")
+    channels = cur.fetchall()
+
+    if not channels:
+        await callback_query.message.edit("No channels found where bot is admin.")
         return
 
-    buttons = []
-    for chat_id, title in rows:
-        # Convert chat_id to public t.me/c/... link only for supergroups/channels
-        chat_link = f"https://t.me/c/{str(chat_id)[4:]}" if str(chat_id).startswith("-100") else None
-        if chat_link:
-            buttons.append([InlineKeyboardButton(f"📣 {title}", url=chat_link)])
+    # Create a button for each channel
+    buttons = [
+        [InlineKeyboardButton(text=title, callback_data=f"channel_{chat_id}")]
+        for chat_id, title in channels
+    ]
 
-    buttons.append([InlineKeyboardButton("🔙 Back", callback_data="back_to_home")])
+    buttons.append([InlineKeyboardButton("🔙 Back", callback_data="start_menu")])
 
     await callback_query.message.edit(
-        "🔧 **Here are the channels/groups where I'm admin:**",
-        reply_markup=InlineKeyboardMarkup(buttons)
+        "📡 *Your Admin Channels:*",
+        reply_markup=InlineKeyboardMarkup(buttons),
+        parse_mode="Markdown"
     )
     
 @Client.on_callback_query(filters.regex("back_to_home"))
