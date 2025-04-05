@@ -3,6 +3,14 @@ from pyrogram import Client
 from aiohttp import web
 from config import API_ID, API_HASH, BOT_TOKEN
 
+cur.execute("""
+CREATE TABLE IF NOT EXISTS channels (
+    chat_id INTEGER PRIMARY KEY,
+    title TEXT
+)
+""")
+conn.commit()
+
 # Define routes for aiohttp web server
 r = web.RouteTableDef()
 
