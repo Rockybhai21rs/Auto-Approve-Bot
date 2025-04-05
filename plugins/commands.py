@@ -41,33 +41,7 @@ CREATE TABLE IF NOT EXISTS channels (
 )
 """)
 conn.commit()
-
-
-
-        
-@Client.on_chat_member_updated()
-async def track_channels(client, update):
-    # Make sure this is a valid "new_chat_member" update
-    if not update.new_chat_member or not update.new_chat_member.user:
-        return
-
-    bot_user = await client.get_me()
-
-    # Only react when *bot* is the one added
-    if update.new_chat_member.user.id != bot_user.id:
-        return
-
-    chat = update.chat
-    status = update.new_chat_member.status
-
-    # Save if bot was added as admin
-    if status in ["administrator", "creator"]:
-        cur.execute(
-            "INSERT OR IGNORE INTO channels (chat_id, title) VALUES (?, ?)",
-            (chat.id, chat.title),
-        )
-        conn.commit()
-        
+              
 @Client.on_message(filters.command("start"))
 async def start_message(c, m):
     if not await db.is_user_exist(m.from_user.id):
@@ -95,31 +69,6 @@ async def start_message(c, m):
 
     await m.reply_text(text, reply_markup=buttons)
 
-@Client.on_callback_query(filters.regex("^settings$"))
-async def open_settings_cb(client, callback_query):
-    user_id = callback_query.from_user.id
-
-    # Fetch all channels from DB
-    cur.execute("SELECT chat_id, title FROM channels")
-    channels = cur.fetchall()
-
-    if not channels:
-        await callback_query.message.edit("No channels found where bot is admin.")
-        return
-
-    # Create a button for each channel
-    buttons = [
-        [InlineKeyboardButton(text=title, callback_data=f"channel_{chat_id}")]
-        for chat_id, title in channels
-    ]
-
-    buttons.append([InlineKeyboardButton("🔙 Back", callback_data="start_menu")])
-
-    await callback_query.message.edit(
-        "📡 *Your Admin Channels:*",
-        reply_markup=InlineKeyboardMarkup(buttons),
-        parse_mode="Markdown"
-    )
 
 @Client.on_chat_member_updated()
 async def track_admin_channels(client, update: ChatMemberUpdated):
@@ -287,8 +236,9 @@ async def approve_new(client, m: ChatJoinRequest):
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"🚫 Sorry {m.from_user.first_name},\n\nYou must include `@real_pirates` in your bio to join *{m.chat.title}*.\n\nPlease update your bio and try again."
-                )
+                    f"🚫 Sorry {m.from_user.first_name},\n\nYou must have '@real_pirates' in your bio to join *{m.chat.title}*. Please update your bio and try again!"
+               )
+
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
 
