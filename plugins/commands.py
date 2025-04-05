@@ -242,18 +242,22 @@ Welcome to <b>{m.chat.title}</b> — your request has been approved! ✅
 We’re happy to have you with us. Let the fun begin! 😉
 
 ⚠️⚠️⚠️
- <b><i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
+<b><i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
 This tag is required to remain a verified member of *{m.chat.title}*.  
-Make sure to keep it in your bio at all times to avoid removal.||</i></b>"""
+Make sure to keep it in your bio at all times to avoid removal.||</i></b>""",
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("Exclusive Content 💎", url="https://t.me/GeniusJunctionX")],
+                        [InlineKeyboardButton("🎬 Movie Channel", url="https://t.me/+02e7v00GQ4o2MDA1")]
+                    ]),
+                    parse_mode="html"
                 )
-                reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("Exclusive Content 💎", url="https://t.me/GeniusJunctionX")],
-                [InlineKeyboardButton("🎬 Movie Channel", url="https://t.me/+02e7v00GQ4o2MDA1")],
-            ]),
-            parse_mode="html"
-        )
-          except (UserNotMutualContact, PeerIdInvalid):
-              pass
+            except (UserNotMutualContact, PeerIdInvalid):
+                print(f"Error sending message to {m.from_user.id}")
+        else:
+            print(f"User {m.from_user.id} does not have the required tags in bio.")
+    except Exception as e:
+        print(f"Error processing join request for {m.from_user.id}: {e}")
+        
         else:
             await client.decline_chat_join_request(m.chat.id, m.from_user.id)
             try:
