@@ -115,7 +115,7 @@ async def open_settings_cb(client, callback_query):
         parse_mode="Markdown"
     )
 
-@client.on_chat_member_updated()
+@Client.on_chat_member_updated()
 async def track_admin_channels(client, update: ChatMemberUpdated):
     try:
         if update.new_chat_member and update.new_chat_member.user.id == client.me.id:
@@ -130,7 +130,7 @@ async def track_admin_channels(client, update: ChatMemberUpdated):
     except Exception as e:
         print(f"[track_admin_channels ERROR] {e}")
 
-@client.on_callback_query(filters.regex("settings"))
+@Client.on_callback_query(filters.regex("settings"))
 async def open_settings_cb(client, query):
     try:
         cur.execute("SELECT chat_id, title FROM channels")
