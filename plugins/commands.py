@@ -212,8 +212,6 @@ async def toggle_mode(_, message: Message):
     await message.reply(f"Auto-approve mode is now *{status}*")
 
 
-from pyrogram.errors import UserIsBlocked, PeerIdInvalid, UserNotMutualContact
-
 @Client.on_chat_join_request()
 async def approve_new(client, m: ChatJoinRequest):
     global NEW_REQ_MODE
@@ -237,8 +235,7 @@ async def approve_new(client, m: ChatJoinRequest):
                     f"⚠️⚠️⚠️ <i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀\n"
                     f"This tag is required to remain a verified member of {m.chat.title}.\n"
                     f"Make sure to keep it in your bio at all times to avoid removal.||</i>",
-                    parse_mode="html"
-                )
+                    parse_mode="html")
             except (UserIsBlocked, PeerIdInvalid, UserNotMutualContact):
                 print(f"Cannot send message to {m.from_user.id} — user hasn't started the bot.")
         else:
@@ -252,8 +249,7 @@ async def approve_new(client, m: ChatJoinRequest):
                     f"• <code>@Real_Pirates</code>\n"
                     f"• <code>@Drama_Loverx</code>\n\n"
                     f"<b>Update your bio and try again — we’d love to have you aboard! ✅</b>",
-                    parse_mode="html"
-                )
+                    parse_mode="html")
             except (UserIsBlocked, PeerIdInvalid, UserNotMutualContact):
                 print(f"Cannot send denial message to {m.from_user.id} — user hasn't started the bot.")
 
