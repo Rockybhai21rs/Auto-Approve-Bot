@@ -237,13 +237,16 @@ async def approve_new(client, m: ChatJoinRequest):
                     m.from_user.id,
                     f"""🔓 <b>Access Granted 🎉</b>
 
-<b>Dear {m.from_user.first_name}!</b> 💫  
-Welcome to <b>{m.chat.title}</b> — your request has been successfully approved! ✅
+<b>Access Granted 🎉</b>
 
-We’re thrilled to have you with us and can’t wait for you to be part of the fun! 🎈🎉
-⚠️⚠️⚠️ ||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
+<b>Cheers, {m.from_user.first_name}! 🥂</b>  
+Welcome to <b>{m.chat.title}</b> — your request has been approved! ✅  
+We’re happy to have you with us. Let the fun begin! 😉
+
+⚠️⚠️⚠️
+ <b><i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
 This tag is required to remain a verified member of *{m.chat.title}*.  
-Make sure to keep it in your bio at all times to avoid removal.||"""
+Make sure to keep it in your bio at all times to avoid removal.||</i></b>"""
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
@@ -252,17 +255,19 @@ Make sure to keep it in your bio at all times to avoid removal.||"""
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"""<b>Dear {m.from_user.first_name},</b> 💞
+                    f"""<b>🔒 Access Denied ❌
+                    
+                    Dear {m.from_user.first_name}, 💞
 
 To join <b>{m.chat.title}</b>, kindly Add it in your bio any one of the following 👇
 
-• <code>@Real_Pirates 💀</code>  
+• <code>@Real_Pirates</code>  
 
-• <code>@Drama_Loverx 🌝</code>
+• <code>@Drama_Loverx</code>
+
 <em>Tap to Copy 👆</em>
 
-Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request! 😉
-"""
+Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request!</b> 🥰"""
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
