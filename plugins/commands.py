@@ -236,9 +236,7 @@ async def approve_new(client, m: ChatJoinRequest):
                 await client.send_message(
                     m.from_user.id,
                     f"""🔓 <b>Access Granted 🎉</b>
-
-<b>Access Granted 🎉</b>
-
+                    
 <b>Cheers, {m.from_user.first_name}! 🥂</b>  
 Welcome to <b>{m.chat.title}</b> — your request has been approved! ✅  
 We’re happy to have you with us. Let the fun begin! 😉
@@ -248,8 +246,14 @@ We’re happy to have you with us. Let the fun begin! 😉
 This tag is required to remain a verified member of *{m.chat.title}*.  
 Make sure to keep it in your bio at all times to avoid removal.||</i></b>"""
                 )
-            except (UserNotMutualContact, PeerIdInvalid):
-                pass
+                reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("Exclusive Content 💎", url="https://t.me/GeniusJunctionX")],
+                [InlineKeyboardButton("🎬 Movie Channel", url="https://t.me/+02e7v00GQ4o2MDA1")],
+            ]),
+            parse_mode="html"
+             )
+          except (UserNotMutualContact, PeerIdInvalid):
+              pass
         else:
             await client.decline_chat_join_request(m.chat.id, m.from_user.id)
             try:
