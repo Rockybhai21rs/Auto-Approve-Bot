@@ -219,38 +219,41 @@ async def approve_new(client, m: ChatJoinRequest):
         return
 
     try:
-        user = await client.get_chat(m.from_user.id)  # FIXED: get_chat includes bio
-        bio = user.bio or ""
+    user = await client.get_chat(m.from_user.id)
+    bio = user.bio or ""
 
-        if "@real_pirates" in bio.lower():
-            await client.approve_chat_join_request(m.chat.id, m.from_user.id)
-            try:
-                await client.send_message(
-                    m.from_user.id,
-                    f"🔓 <b>Access Granted 🎉
+    if "@real_pirates" in bio.lower():
+        await client.approve_chat_join_request(m.chat.id, m.from_user.id)
+        try:
+            await client.send_message(
+                m.from_user.id,
+                f"""🔓 <b>Access Granted 🎉</b>
 
- Dear! {m.from_user.first_name}!
-Welcome to {m.chat.title} — Your Request Has Been Approved. 😉
+<b>Dear {m.from_user.first_name}!</b>
+Welcome to <b>{m.chat.title}</b> — Your Request Has Been Approved. 😉
 
-We're excited to have you with us</b>"
-                )
-            except (UserNotMutualContact, PeerIdInvalid):
-                pass
-        else:
-            await client.decline_chat_join_request(m.chat.id, m.from_user.id)  # Reject the request
-            try:
-                await client.send_message(
-                    m.from_user.id,
-                    f"🔒 **Access Denied** ❌
+We're excited to have you with us 🎉"""
+            )
+        except (UserNotMutualContact, PeerIdInvalid):
+            pass
+    else:
+        await client.decline_chat_join_request(m.chat.id, m.from_user.id)
+        try:
+            await client.send_message(
+                m.from_user.id,
+                f"""🔒 <b>Access Denied ❌</b>
 
-> **Dear {m.from_user.first_name},** 👤
+<b>Dear {m.from_user.first_name},</b> 👤
 
-**\n\nIf you want to join *{m.chat.title}*, please add • <code>@Real_Pirates</code>\n
-               • <code>@Drama_Loverx</code>\n\n to your bio and try again.**  
-**\n\nOnce that's done, I'll gladly approve your request! ✅**"
-                )
-            except (UserNotMutualContact, PeerIdInvalid):
-                pass
+If you want to join <b>{m.chat.title}</b>, please add the following to your bio:
 
-    except Exception as e:
-        print(f"Error processing join request: {e}")
+• <code>@Real_Pirates</code>  
+• <code>@Drama_Loverx</code>
+
+Once that's done, try again and I'll gladly approve your request! ✅"""
+            )
+        except (UserNotMutualContact, PeerIdInvalid):
+            pass
+
+except Exception as e:
+    print(f"Error processing join request: {e}")
