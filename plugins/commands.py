@@ -59,10 +59,10 @@ async def start_message(c, m):
     )
 
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs ⇆", url="https://telegram.me/QuickAcceptBot?startgroup=true&admin=invite_users")],
+        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs ⇆", url="https://telegram.me/X_Queen_chat_bot?startgroup=true&admin=invite_users")],
         [InlineKeyboardButton("• ᴜᴩᴅᴀᴛᴇꜱ •", url="https://t.me/Real_Pirates"),
          InlineKeyboardButton("• ꜱᴜᴩᴩᴏʀᴛ •", url="https://t.me/Movie_Pirates_x")],
-        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ⇆", url="https://telegram.me/QuickAcceptBot?startchannel=true&admin=invite_users")],
+        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ⇆", url="https://telegram.me/X_Queen_chat_bot?startchannel=true&admin=invite_users")],
         [InlineKeyboardButton("⚙️ Settings", callback_data="settings")]
 ])
 
