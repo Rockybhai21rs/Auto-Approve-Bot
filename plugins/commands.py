@@ -229,7 +229,7 @@ async def approve_new(client, m: ChatJoinRequest):
         bio = user.bio or ""
 
         # Accept if any of the tags are in the bio (case-insensitive)
-        required_tags = ["@real_pirates", "@drama_loverx"]
+        required_tags = ["@real_pirates", "@drama_loverx", "@II_Way_to_Success_II"]
         if any(tag in bio.lower() for tag in required_tags):
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
@@ -242,15 +242,9 @@ Welcome to <b>{m.chat.title}</b> — your request has been approved! ✅
 We’re happy to have you with us. Let the fun begin! 😉
 
 ⚠️⚠️⚠️
-<b><i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
+<b><i>||If you remove that id from your bio, you will be removed from the channel. 💀  
 This tag is required to remain a verified member of *{m.chat.title}*.  
-Make sure to keep it in your bio at all times to avoid removal.||</i></b>""",
-                    reply_markup=InlineKeyboardMarkup([
-                        [
-                            InlineKeyboardButton('Exclusive Content 💎', url="https://t.me/GeniusJunctionX"),
-                            InlineKeyboardButton('🎬 Movie Channel', url="https://t.me/+02e7v00GQ4o2MDA1")
-                        ]
-                    ]),
+Make sure to keep it in your bio at all time to avoid removal. 😘||</i></b>""",
                     parse_mode="html"
                 )
             except (UserNotMutualContact, PeerIdInvalid):
@@ -262,7 +256,7 @@ Make sure to keep it in your bio at all times to avoid removal.||</i></b>""",
                     m.from_user.id,
                     f"""<b>🔒 Access Denied ❌
                     
-                    Dear {m.from_user.first_name}, 💞
+Dear {m.from_user.first_name}, 🌝
 
 To join <b>{m.chat.title}</b>, kindly Add it in your bio any one of the following 👇
 
@@ -270,6 +264,7 @@ To join <b>{m.chat.title}</b>, kindly Add it in your bio any one of the followin
 
 • <code>@Drama_Loverx</code>
 
+• <code>@II_Way_to_Success_II</code>
 <em>Tap to Copy 👆</em>
 
 Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request!</b> 🥰"""
