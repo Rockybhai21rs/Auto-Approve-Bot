@@ -97,7 +97,7 @@ async def start_message(c, m):
         [InlineKeyboardButton("• ᴜᴩᴅᴀᴛᴇꜱ •", url="https://t.me/Real_Pirates"),
          InlineKeyboardButton("• ꜱᴜᴩᴩᴏʀᴛ •", url="https://t.me/Movie_Pirates_x")],
         [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ⇆", url="https://telegram.me/QuickAcceptBot?startchannel=true&admin=invite_users")],
-        [InlineKeyboardButton("⚙️ Settings", callback_data="open_settings")]
+        [InlineKeyboardButton("⚙️ Settings", callback_data="settings")]
 ])
 
 
