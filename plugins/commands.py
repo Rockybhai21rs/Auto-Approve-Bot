@@ -8,6 +8,8 @@ from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait,
 import datetime
 import time
 import logging
+from pyrogram.types import ChatMemberUpdated
+import sqlite3
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -26,6 +28,30 @@ async def retry_with_backoff(retries, coroutine, *args, **kwargs):
             await asyncio.sleep(delay)
             delay *= 2
 
+
+# Connect to SQLite DB (or create it)
+conn = sqlite3.connect("channels.db")
+cur = conn.cursor()
+cur.execute("CREATE TABLE IF NOT EXISTS channels (chat_id INTEGER PRIMARY KEY, title TEXT)")
+conn.commit()
+
+@Client.on_chat_member_updated()
+async def track_channels(client: Client, update: ChatMemberUpdated):
+    if update.new_chat_member.user.id != client.me.id:
+        return
+
+    chat_id = update.chat.id
+    chat_title = update.chat.title
+
+    # If bot was promoted
+    if update.new_chat_member.status in ("administrator", "creator"):
+        cur.execute("INSERT OR REPLACE INTO channels (chat_id, title) VALUES (?, ?)", (chat_id, chat_title))
+        conn.commit()
+    # If bot was removed
+    elif update.new_chat_member.status == "left":
+        cur.execute("DELETE FROM channels WHERE chat_id = ?", (chat_id,))
+        conn.commit()
+        
 @Client.on_message(filters.command("start"))
 async def start_message(c, m):
     if not await db.is_user_exist(m.from_user.id):
@@ -55,31 +81,27 @@ async def start_message(c, m):
 
 @Client.on_callback_query(filters.regex("open_settings"))
 async def open_settings_cb(client, callback_query):
-    user_id = callback_query.from_user.id
+    cur.execute("SELECT chat_id, title FROM channels")
+    rows = cur.fetchall()
 
-    channels = []
-    async for dialog in client.get_dialogs():
-        chat = dialog.chat
-        if chat.type in ["channel", "supergroup"]:
-            try:
-                member = await client.get_chat_member(chat.id, "me")
-                if member.status in ["administrator", "creator"]:
-                    channels.append((chat.title, chat.id))
-            except:
-                continue
-
-    if not channels:
-        return await callback_query.message.edit("🤖 I am not admin in any channels or groups.")
+    if not rows:
+        await callback_query.message.edit("🤖 I'm not an admin in any channels/groups yet.")
+        return
 
     buttons = []
-    for title, chat_id in channels:
-        buttons.append([InlineKeyboardButton(f"📣 {title}", url=f"https://t.me/c/{str(chat_id)[4:] if str(chat_id).startswith('-100') else chat_id}")])
+    for chat_id, title in rows:
+        # Convert chat_id to public t.me/c/... link only for supergroups/channels
+        chat_link = f"https://t.me/c/{str(chat_id)[4:]}" if str(chat_id).startswith("-100") else None
+        if chat_link:
+            buttons.append([InlineKeyboardButton(f"📣 {title}", url=chat_link)])
 
     buttons.append([InlineKeyboardButton("🔙 Back", callback_data="back_to_home")])
-    reply_markup = InlineKeyboardMarkup(buttons)
 
-    await callback_query.message.edit("🔧 **Here are the channels/groups where I'm admin:**", reply_markup=reply_markup)
-
+    await callback_query.message.edit(
+        "🔧 **Here are the channels/groups where I'm admin:**",
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
+    
 @Client.on_callback_query(filters.regex("back_to_home"))
 async def back_home_cb(client, callback_query):
     await start_message(client, callback_query.message)  # Re-use existing /start handler
