@@ -264,7 +264,6 @@ To join <b>{m.chat.title}</b>, kindly Add it in your bio any one of the followin
 
 • <code>@Drama_Loverx</code>
 
-• <code>@II_Way_to_Success_II</code>
 <em>Tap to Copy 👆</em>
 
 Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request!</b> 🥰"""
