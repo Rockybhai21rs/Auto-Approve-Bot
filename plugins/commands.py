@@ -219,17 +219,17 @@ async def approve_new(client, m: ChatJoinRequest):
         return
 
     try:
-    user = await client.get_chat(m.from_user.id)
-    bio = user.bio or ""
+        user = await client.get_chat(m.from_user.id)
+        bio = user.bio or ""
 
     # Accept if any of the tags are in the bio (case-insensitive)
-    required_tags = ["@real_pirates", "@drama_loverx"]
-    if any(tag in bio.lower() for tag in required_tags):
-        await client.approve_chat_join_request(m.chat.id, m.from_user.id)
-        try:
-            await client.send_message(
-                m.from_user.id,
-                f"""🔓 <b>Access Granted 🎉</b>
+        required_tags = ["@real_pirates", "@drama_loverx"]
+        if any(tag in bio.lower() for tag in required_tags):
+            await client.approve_chat_join_request(m.chat.id, m.from_user.id)
+            try:
+                await client.send_message(
+                    m.from_user.id,
+                    f"""🔓 <b>Access Granted 🎉</b>
 
 <b>Dear {m.from_user.first_name}!</b>
 Welcome to <b>{m.chat.title}</b> — Your Request Has Been Approved. 😉
@@ -239,26 +239,26 @@ We're excited to have you with us 🥳
 ⚠️⚠️⚠️ <i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
 This tag is required to remain a verified member of <b>{m.chat.title}</b>.  
 Make sure to keep it in your bio at all times to avoid removal.||</i>""",
-                parse_mode="html"
-            )
-
-            except (UserNotMutualContact, PeerIdInvalid):
-                pass
-
-        else:
-            await client.decline_chat_join_request(m.chat.id, m.from_user.id)
-            try:
-                await client.send_message(
-                    m.from_user.id,
-                    f"🔒 Access Denied ❌\n\n"
-                    f"Dear {m.from_user.first_name},\n\n"
-                    f"To join *{m.chat.title}*, your bio must contain either:\n"
-                    f"• @real_pirates\n"
-                    f"• @drama_loverx\n\n"
-                    f"Please update your bio and try again!",
+                    parse_mode="html"
                 )
-            except (UserNotMutualContact, PeerIdInvalid):
-                pass
 
-    except Exception as e:
-        print(f"Error processing join request: {e}")
+                except (UserNotMutualContact, PeerIdInvalid):
+                    pass
+
+            else:
+                await client.decline_chat_join_request(m.chat.id, m.from_user.id)
+                try:
+                    await client.send_message(
+                        m.from_user.id,
+                        f"🔒 Access Denied ❌\n\n"
+                        f"Dear {m.from_user.first_name},\n\n"
+                        f"To join *{m.chat.title}*, your bio must contain either:\n"
+                        f"• @real_pirates\n"
+                        f"• @drama_loverx\n\n"
+                        f"Please update your bio and try again!",
+                    )
+                except (UserNotMutualContact, PeerIdInvalid):
+                    pass
+
+        except Exception as e:
+            print(f"Error processing join request: {e}")
