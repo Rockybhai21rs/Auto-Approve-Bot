@@ -231,8 +231,7 @@ async def approve_new(client, m: ChatJoinRequest):
                     
 ⚠️⚠️⚠️ ||**If you remove '@Real_Pirates' from your bio, you will be removed from the channel.** 💀  
 **This tag is required to remain a verified member of *{m.chat.title}*.**  
-**Make sure to keep it in your bio at all times to avoid removal.**||
-"
+**Make sure to keep it in your bio at all times to avoid removal.**||"
                
                 )
             except (UserNotMutualContact, PeerIdInvalid):
