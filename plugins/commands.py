@@ -43,21 +43,7 @@ CREATE TABLE IF NOT EXISTS channels (
 conn.commit()
 
 
-@Client.on_chat_member_updated()
-async def track_admin_channels(client, update: ChatMemberUpdated):
-    chat = update.chat
-    new_status = update.new_chat_member.status
-    old_status = update.old_chat_member.status
 
-    # Check if bot was promoted to ADMIN in a CHANNEL
-    if chat.type == "channel" and old_status != ChatMemberStatus.ADMINISTRATOR and new_status == ChatMemberStatus.ADMINISTRATOR:
-        chat_id = chat.id
-        title = chat.title
-
-        # Save to DB
-        cur.execute("INSERT OR IGNORE INTO channels (chat_id, title) VALUES (?, ?)", (chat_id, title))
-        conn.commit()
-        print(f"✅ Bot is now admin in: {title} ({chat_id})")
         
 @Client.on_chat_member_updated()
 async def track_channels(client: Client, update: ChatMemberUpdated):
@@ -128,7 +114,44 @@ async def open_settings_cb(client, callback_query):
         reply_markup=InlineKeyboardMarkup(buttons),
         parse_mode="Markdown"
     )
-    
+
+@client.on_chat_member_updated()
+async def track_admin_channels(client, update: ChatMemberUpdated):
+    try:
+        if update.new_chat_member and update.new_chat_member.user.id == client.me.id:
+            new_status = update.new_chat_member.status
+            if new_status == "administrator":
+                chat_id = update.chat.id
+                title = update.chat.title or "Unnamed"
+
+                cur.execute("INSERT OR IGNORE INTO channels (chat_id, title) VALUES (?, ?)", (chat_id, title))
+                conn.commit()
+                print(f"✅ Added: {title} ({chat_id})")
+    except Exception as e:
+        print(f"[track_admin_channels ERROR] {e}")
+
+@client.on_callback_query(filters.regex("settings"))
+async def open_settings_cb(client, query):
+    try:
+        cur.execute("SELECT chat_id, title FROM channels")
+        rows = cur.fetchall()
+
+        if not rows:
+            await query.message.edit_text("⚠️ No channels found where I'm admin.")
+            return
+
+        keyboard = []
+        for chat_id, title in rows:
+            # For private channels (starting with -100), format correctly
+            channel_url = f"https://t.me/c/{str(chat_id)[4:]}" if str(chat_id).startswith("-100") else f"https://t.me/{title}"
+            keyboard.append([InlineKeyboardButton(title, url=channel_url)])
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.message.edit_text("🛠️ Channels where I'm admin:", reply_markup=reply_markup)
+    except Exception as e:
+        print(f"[open_settings_cb ERROR] {e}")
+        await query.message.edit_text("❌ Error loading channels.")
+        
 @Client.on_callback_query(filters.regex("back_to_home"))
 async def back_home_cb(client, callback_query):
     await start_message(client, callback_query.message)  # Re-use existing /start handler
