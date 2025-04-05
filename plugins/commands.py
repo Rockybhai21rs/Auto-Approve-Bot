@@ -246,8 +246,10 @@ We’re happy to have you with us. Let the fun begin! 😉
 This tag is required to remain a verified member of *{m.chat.title}*.  
 Make sure to keep it in your bio at all times to avoid removal.||</i></b>""",
                     reply_markup=InlineKeyboardMarkup([
-                        [InlineKeyboardButton("Exclusive Content 💎", url="https://t.me/GeniusJunctionX")],
-                        [InlineKeyboardButton("🎬 Movie Channel", url="https://t.me/+02e7v00GQ4o2MDA1")]
+                        [
+                            InlineKeyboardButton('Exclusive Content 💎', url="https://t.me/GeniusJunctionX"),
+                            InlineKeyboardButton('🎬 Movie Channel', url="https://t.me/+02e7v00GQ4o2MDA1")
+                        ]
                     ]),
                     parse_mode="html"
                 )
