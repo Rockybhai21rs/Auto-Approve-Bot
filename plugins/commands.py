@@ -219,39 +219,41 @@ async def approve_new(client, m: ChatJoinRequest):
         return
 
     try:
-        user = await client.get_chat(m.from_user.id)  # FIXED: get_chat includes bio
-        bio = user.bio or ""
+        user = await client.get_chat(m.from_user.id)  # Includes bio
+        bio = (user.bio or "").lower()
 
-        if "@Real_Pirates" in bio.lower():
+        REQUIRED_TAGS = ["@real_pirates", "@drama_loverx"]
+
+        if any(tag in bio for tag in REQUIRED_TAGS):
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"✅ <b>Access Granted 🎉\n\nDear! {m.from_user.first_name}! 💞\n\nWelcome to {m.chat.title} — Your Request Has Been Approved. 😉We're excited to have you with us 🥰</b>
-                    
-⚠️⚠️⚠️ ||**If you remove '@Real_Pirates' from your bio, you will be removed from the channel.** 💀  
-**This tag is required to remain a verified member of *{m.chat.title}*.**  
-**Make sure to keep it in your bio at all times to avoid removal.**||"
-               
+                    f"✅ <b>Access Granted 🎉</b>\n\n"
+                    f"<b>Dear {m.from_user.first_name} 💞</b>,\n\n"
+                    f"<b>Welcome to {m.chat.title} — Your request has been approved! 😉 We're excited to have you with us 🥰</b>\n\n"
+                    f"⚠️⚠️⚠️ <i>||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀\n"
+                    f"This tag is required to remain a verified member of {m.chat.title}.\n"
+                    f"Make sure to keep it in your bio at all times to avoid removal.||</i>",
+                    parse_mode="html"
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
         else:
-            await client.decline_chat_join_request(m.chat.id, m.from_user.id)  # Reject the request
+            await client.decline_chat_join_request(m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"🔒 **Access Denied** ❌
-
-> **Dear {m.from_user.first_name},** 👤
-
-**\n\nIf you want to join *{m.chat.title}*, please add '@Real_Pirates' 🏴‍☠️ to your bio and try again.**  
-**\n\nOnce that's done, I'll gladly approve your request! ✅**"
-               )
-
+                    f"🔒 <b>Access Denied ❌</b>\n\n"
+                    f"<blockquote><b>Dear {m.from_user.first_name} 👤</b></blockquote>\n\n"
+                    f"<b>To join <i>{m.chat.title}</i>, your bio must include one of the following:</b>\n"
+                    f"• <code>@Real_Pirates</code>\n"
+                    f"• <code>@Drama_Loverx</code>\n\n"
+                    f"<b>Update your bio and try again — we’d love to have you aboard! ✅</b>",
+                    parse_mode="html"
+                )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
 
     except Exception as e:
         print(f"Error processing join request: {e}")
-
