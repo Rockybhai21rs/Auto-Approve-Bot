@@ -46,10 +46,43 @@ async def start_message(c, m):
         [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘs ⇆", url="https://telegram.me/QuickAcceptBot?startgroup=true&admin=invite_users")],
         [InlineKeyboardButton("• ᴜᴩᴅᴀᴛᴇꜱ •", url="https://t.me/Real_Pirates"),
          InlineKeyboardButton("• ꜱᴜᴩᴩᴏʀᴛ •", url="https://t.me/Movie_Pirates_x")],
-        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ⇆", url="https://telegram.me/QuickAcceptBot?startchannel=true&admin=invite_users")]
-    ])
+        [InlineKeyboardButton("⇆ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ⇆", url="https://telegram.me/QuickAcceptBot?startchannel=true&admin=invite_users")],
+        [InlineKeyboardButton("⚙️ Settings", callback_data="open_settings")]
+])
+
 
     await m.reply_text(text, reply_markup=buttons)
+
+@Client.on_callback_query(filters.regex("open_settings"))
+async def open_settings_cb(client, callback_query):
+    user_id = callback_query.from_user.id
+
+    channels = []
+    async for dialog in client.get_dialogs():
+        chat = dialog.chat
+        if chat.type in ["channel", "supergroup"]:
+            try:
+                member = await client.get_chat_member(chat.id, "me")
+                if member.status in ["administrator", "creator"]:
+                    channels.append((chat.title, chat.id))
+            except:
+                continue
+
+    if not channels:
+        return await callback_query.message.edit("🤖 I am not admin in any channels or groups.")
+
+    buttons = []
+    for title, chat_id in channels:
+        buttons.append([InlineKeyboardButton(f"📣 {title}", url=f"https://t.me/c/{str(chat_id)[4:] if str(chat_id).startswith('-100') else chat_id}")])
+
+    buttons.append([InlineKeyboardButton("🔙 Back", callback_data="back_to_home")])
+    reply_markup = InlineKeyboardMarkup(buttons)
+
+    await callback_query.message.edit("🔧 **Here are the channels/groups where I'm admin:**", reply_markup=reply_markup)
+
+@Client.on_callback_query(filters.regex("back_to_home"))
+async def back_home_cb(client, callback_query):
+    await start_message(client, callback_query.message)  # Re-use existing /start handler
 
 @Client.on_message(filters.command('help'))
 async def help_message(c,m):
