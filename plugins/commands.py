@@ -46,20 +46,26 @@ conn.commit()
 
         
 @Client.on_chat_member_updated()
-async def track_channels(client: Client, update: ChatMemberUpdated):
-    if update.new_chat_member.user.id != client.me.id:
+async def track_channels(client, update):
+    # Make sure this is a valid "new_chat_member" update
+    if not update.new_chat_member or not update.new_chat_member.user:
         return
 
-    chat_id = update.chat.id
-    chat_title = update.chat.title
+    bot_user = await client.get_me()
 
-    # If bot was promoted
-    if update.new_chat_member.status in ("administrator", "creator"):
-        cur.execute("INSERT OR REPLACE INTO channels (chat_id, title) VALUES (?, ?)", (chat_id, chat_title))
-        conn.commit()
-    # If bot was removed
-    elif update.new_chat_member.status == "left":
-        cur.execute("DELETE FROM channels WHERE chat_id = ?", (chat_id,))
+    # Only react when *bot* is the one added
+    if update.new_chat_member.user.id != bot_user.id:
+        return
+
+    chat = update.chat
+    status = update.new_chat_member.status
+
+    # Save if bot was added as admin
+    if status in ["administrator", "creator"]:
+        cur.execute(
+            "INSERT OR IGNORE INTO channels (chat_id, title) VALUES (?, ?)",
+            (chat.id, chat.title),
+        )
         conn.commit()
         
 @Client.on_message(filters.command("start"))
