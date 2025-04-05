@@ -222,12 +222,18 @@ async def approve_new(client, m: ChatJoinRequest):
         user = await client.get_chat(m.from_user.id)  # FIXED: get_chat includes bio
         bio = user.bio or ""
 
-        if "@real_pirates" in bio.lower():
+        if "@Real_Pirates" in bio.lower():
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"✅ Hello {m.from_user.first_name},\n\nYour request to join *{m.chat.title}* has been approved!"
+                    f"✅ <b>Access Granted 🎉\n\nDear! {m.from_user.first_name}! 💞\n\nWelcome to {m.chat.title} — Your Request Has Been Approved. 😉We're excited to have you with us 🥰</b>
+                    
+⚠️⚠️⚠️ ||**If you remove '@Real_Pirates' from your bio, you will be removed from the channel.** 💀  
+**This tag is required to remain a verified member of *{m.chat.title}*.**  
+**Make sure to keep it in your bio at all times to avoid removal.**||
+"
+               
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
@@ -236,7 +242,12 @@ async def approve_new(client, m: ChatJoinRequest):
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"🚫 Sorry {m.from_user.first_name},\n\nYou must have '@real_pirates' in your bio to join *{m.chat.title}*. Please update your bio and try again!"
+                    f"🔒 **Access Denied** ❌
+
+> **Dear {m.from_user.first_name},** 👤
+
+**\n\nIf you want to join *{m.chat.title}*, please add '@Real_Pirates' 🏴‍☠️ to your bio and try again.**  
+**\n\nOnce that's done, I'll gladly approve your request! ✅**"
                )
 
             except (UserNotMutualContact, PeerIdInvalid):
