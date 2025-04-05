@@ -218,30 +218,36 @@ async def approve_new(client, m: ChatJoinRequest):
     if not NEW_REQ_MODE:
         return
 
-    try:
-    user = await client.get_chat(m.from_user.id)
-    bio = user.bio or ""
+    @Client.on_chat_join_request()
+async def approve_new(client, m: ChatJoinRequest):
+    global NEW_REQ_MODE
+    if not NEW_REQ_MODE:
+        return
 
-    if "@real_pirates" in bio.lower():
-        await client.approve_chat_join_request(m.chat.id, m.from_user.id)
-        try:
-            await client.send_message(
-                m.from_user.id,
-                f"""🔓 <b>Access Granted 🎉</b>
+    try:
+        user = await client.get_chat(m.from_user.id)
+        bio = user.bio or ""
+
+        if "@real_pirates" in bio.lower():
+            await client.approve_chat_join_request(m.chat.id, m.from_user.id)
+            try:
+                await client.send_message(
+                    m.from_user.id,
+                    f"""🔓 <b>Access Granted 🎉</b>
 
 <b>Dear {m.from_user.first_name}!</b>
 Welcome to <b>{m.chat.title}</b> — Your Request Has Been Approved. 😉
 
 We're excited to have you with us 🎉"""
-            )
-        except (UserNotMutualContact, PeerIdInvalid):
-            pass
-    else:
-        await client.decline_chat_join_request(m.chat.id, m.from_user.id)
-        try:
-            await client.send_message(
-                m.from_user.id,
-                f"""🔒 <b>Access Denied ❌</b>
+                )
+            except (UserNotMutualContact, PeerIdInvalid):
+                pass
+        else:
+            await client.decline_chat_join_request(m.chat.id, m.from_user.id)
+            try:
+                await client.send_message(
+                    m.from_user.id,
+                    f"""🔒 <b>Access Denied ❌</b>
 
 <b>Dear {m.from_user.first_name},</b> 👤
 
@@ -251,9 +257,9 @@ If you want to join <b>{m.chat.title}</b>, please add the following to your bio:
 • <code>@Drama_Loverx</code>
 
 Once that's done, try again and I'll gladly approve your request! ✅"""
-            )
-        except (UserNotMutualContact, PeerIdInvalid):
-            pass
+                )
+            except (UserNotMutualContact, PeerIdInvalid):
+                pass
 
-except Exception as e:
-    print(f"Error processing join request: {e}")
+    except Exception as e:
+        print(f"Error processing join request: {e}")
