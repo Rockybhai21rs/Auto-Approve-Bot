@@ -252,12 +252,7 @@ Make sure to keep it in your bio at all times to avoid removal.||</i></b>""",
                     parse_mode="html"
                 )
             except (UserNotMutualContact, PeerIdInvalid):
-                print(f"Error sending message to {m.from_user.id}")
-        else:
-            print(f"User {m.from_user.id} does not have the required tags in bio.")
-    except Exception as e:
-        print(f"Error processing join request for {m.from_user.id}: {e}")
-        
+                pass
         else:
             await client.decline_chat_join_request(m.chat.id, m.from_user.id)
             try:
