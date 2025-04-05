@@ -228,7 +228,9 @@ async def approve_new(client, m: ChatJoinRequest):
         user = await client.get_chat(m.from_user.id)
         bio = user.bio or ""
 
-        if "@real_pirates" in bio.lower():
+        # Accept if any of the tags are in the bio (case-insensitive)
+        required_tags = ["@real_pirates", "@drama_loverx"]
+        if any(tag in bio.lower() for tag in required_tags):
             await client.approve_chat_join_request(m.chat.id, m.from_user.id)
             try:
                 await client.send_message(
@@ -252,11 +254,11 @@ Make sure to keep it in your bio at all times to avoid removal.||"""
                     m.from_user.id,
                     f"""<b>Dear {m.from_user.first_name},</b> 💞
 
-To join <b>{m.chat.title}</b>, kindly Add in your bio any one of the following 👇
+To join <b>{m.chat.title}</b>, kindly Add it in your bio any one of the following 👇
 
-• <code>@Real_Pirates</code>  
+• <code>@Real_Pirates 💀</code>  
 
-• <code>@Drama_Loverx</code>  
+• <code>@Drama_Loverx 🌝</code>
 <em>Tap to Copy 👆</em>
 
 Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request! 😉
