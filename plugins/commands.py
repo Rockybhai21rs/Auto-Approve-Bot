@@ -218,7 +218,7 @@ async def approve_new(client, m: ChatJoinRequest):
     if not NEW_REQ_MODE:
         return
 
-    @Client.on_chat_join_request()
+@Client.on_chat_join_request()
 async def approve_new(client, m: ChatJoinRequest):
     global NEW_REQ_MODE
     if not NEW_REQ_MODE:
