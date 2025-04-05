@@ -235,10 +235,13 @@ async def approve_new(client, m: ChatJoinRequest):
                     m.from_user.id,
                     f"""🔓 <b>Access Granted 🎉</b>
 
-<b>Dear {m.from_user.first_name}!</b>
-Welcome to <b>{m.chat.title}</b> — Your Request Has Been Approved. 😉
+<b>Dear {m.from_user.first_name}!</b> 💫  
+Welcome to <b>{m.chat.title}</b> — your request has been successfully approved! ✅
 
-We're excited to have you with us 🎉"""
+We’re thrilled to have you with us and can’t wait for you to be part of the fun! 🎈🎉
+⚠️⚠️⚠️ ||If you remove '@Real_Pirates' from your bio, you will be removed from the channel. 💀  
+This tag is required to remain a verified member of *{m.chat.title}*.  
+Make sure to keep it in your bio at all times to avoid removal.||"""
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
@@ -247,16 +250,17 @@ We're excited to have you with us 🎉"""
             try:
                 await client.send_message(
                     m.from_user.id,
-                    f"""🔒 <b>Access Denied ❌</b>
+                    f"""<b>Dear {m.from_user.first_name},</b> 💞
 
-<b>Dear {m.from_user.first_name},</b> 👤
-
-If you want to join <b>{m.chat.title}</b>, please add the following to your bio:
+To join <b>{m.chat.title}</b>, kindly Add in your bio any one of the following 👇
 
 • <code>@Real_Pirates</code>  
-• <code>@Drama_Loverx</code>
 
-Once that's done, try again and I'll gladly approve your request! ✅"""
+• <code>@Drama_Loverx</code>  
+<em>Tap to Copy 👆</em>
+
+Once you've added it in your bio, return and try joining again using the invite link — I'll be happy to approve your request! 😉
+"""
                 )
             except (UserNotMutualContact, PeerIdInvalid):
                 pass
